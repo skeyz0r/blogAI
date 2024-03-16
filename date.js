@@ -11,6 +11,7 @@ export default function updateEnvVariable(key, newValue) {
     return;
   }
 
+  
   const envContent = fs.readFileSync(envPath, 'utf8');
   const keyRegex = new RegExp(`^${key}=.*`, 'm');
   
