@@ -2,11 +2,11 @@
   "name": "blogAI",
   "version": "1.2.0",
   "description": "BLOGAI",
-  "main": "index.js",
-  "type": "module",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node api/index.js",
-    "dev": "nodemon api/index.js",
+    "postinstall": "prisma generate",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "lint": "eslint --fix src",
     "test": "jest",
     "vercel-build": "echo hello"

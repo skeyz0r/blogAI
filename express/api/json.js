@@ -1,7 +1,7 @@
-import fs from 'fs';
+const fs = require('fs')
 
 
-export default function Write(data)
+function Write(data)
 {
     if(data)
     {
@@ -27,3 +27,4 @@ export default function Write(data)
     }
 }
 
+module.exports = Write

@@ -1,7 +1,7 @@
-import {Storage} from '@google-cloud/storage'
-import { config } from "dotenv";
+require('dotenv').config()
 
-config()
+
+const { Storage } = require('@google-cloud/storage');
 const projectId = process.env.PROJECT_ID;
 const keyFilename = process.env.KEYFILENAME;
 
@@ -9,7 +9,7 @@ const keyFilename = process.env.KEYFILENAME;
 const storage = new Storage({ projectId, keyFilename });
 
 // Define an asynchronous function to upload a file to Google Cloud Storage
-export default async function uploadFile(bucketName, file, fileOutputName) {
+ async function uploadFile(bucketName, file, fileOutputName) {
     try {
         // Get a reference to the specified bucket
         const bucket = storage.bucket(bucketName);
@@ -26,3 +26,5 @@ export default async function uploadFile(bucketName, file, fileOutputName) {
         console.error('Error:', error);
     }
 }
+
+module.exports = uploadFile

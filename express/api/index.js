@@ -1,17 +1,16 @@
-import OpenAI from "openai";
-import { config } from "dotenv";
-config()
-import uploadFile from './google.js'
-import prisma from "../src/prisma.js"
-import express from "express"
-import updateDate from "./date.js";
-import download from "./download.js";
-import Write from "./json.js"
-import fs from 'fs'
+const OpenAI = require('openai')
+require('dotenv').config()
+const uploadFile = require('./google.js')
+const prisma = require('../src/prisma.js')
+const express = require('express')
+const updateDate = require('./date.js')
+const download = require('./download.js')
+const Write = require('./json.js')
+const fs = require('fs')
 
 const app = express()
 
-app.listen(8080, () => {
+app.listen(3000, () => {
     console.log("server started");
     main()
   });
@@ -176,4 +175,4 @@ checkAndUpdateDate();
 
 }
 
-export default app;
+module.exports= app

@@ -1,13 +1,15 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const fs = require('fs')
+const path = require('path')
 
+console.log(require.main)
 // Determine the directory of the current file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+ __filename = require.main.filename;
+ __dirname = path.dirname(__filename);
+
+
 
 // Function to update an existing environment variable in the .env file located in the root directory
-export default function updateEnvVariable(key, newValue) {
+ function updateEnvVariable(key, newValue) {
   // Construct the path to the .env file located in the root directory, assuming this script is in the 'src' folder in the root
   const envPath = path.join(__dirname, '..', '.env');
   
@@ -29,3 +31,5 @@ export default function updateEnvVariable(key, newValue) {
     console.log(`${key} does not exist in .env file.`);
   }
 }
+
+module.exports = updateEnvVariable
