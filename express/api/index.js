@@ -2,10 +2,11 @@ import OpenAI from "openai";
 import { config } from "dotenv";
 config()
 import uploadFile from './google.js'
-import prisma from "./prisma.js";
+import prisma from "../src/prisma.js"
 import express from "express"
 import updateDate from "./date.js";
 import download from "./download.js";
+import Write from "./json.js"
 import fs from 'fs'
 
 const app = express()
@@ -15,8 +16,23 @@ app.listen(8080, () => {
     main()
   });
 
+
+  const data = {
+    private_key_id: process.env.PRIVATE_KEY_ID,
+    private_key: process.env.PRIVATE_KEY,
+    client_email: process.env.CLIENT_EMAIL,
+    client_id: process.env.CLIENT_ID,
+    type: "service_account",
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+    client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/blogai%40minimalist-415400.iam.gserviceaccount.com",
+    universe_domain: "googleapis.com"
+};
+
 function main()
 {
+
   // Define the string
 let date = process.env.DATE;
 
@@ -40,6 +56,29 @@ async function checkAndUpdateDate() {
 
   // Check if difference is 7 days
   if (differenceInDays >= 7) {
+    const filePath = './minimalist.json';
+
+    // Read the JSON file
+    fs.readFile(filePath, 'utf8', async (err, text) => {
+      if (err) {
+        console.error('An error occurred while reading the file:', err);
+        return;
+      }
+    
+      // Parse the data into a JavaScript object
+      const jsonData = JSON.parse(text);
+    
+      // Get the first key of the object
+      const firstKey = Object.keys(jsonData)[0];
+    
+      // Access the value of the first key
+      const firstValue = jsonData[firstKey];
+    if(firstValue !== data.private_key_id)
+    {
+      Write(data)
+    }
+    else
+    {
     console.log(`Updating date from ${currentDate.toDateString()} to ${today.toDateString()}`);
     // Update currentDate to today
     let formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
@@ -119,9 +158,10 @@ async function checkAndUpdateDate() {
             image: imageUrl
           }
         })
-      })
+      }).then(()=>Write(null))
     }
-    
+});
+  }
    else {
     console.log('Not 7 days after the last update yet.');
   }
@@ -130,7 +170,10 @@ async function checkAndUpdateDate() {
   setTimeout(checkAndUpdateDate, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
 }
 
+
 // Start the first check
 checkAndUpdateDate();
 
 }
+
+export default app;
