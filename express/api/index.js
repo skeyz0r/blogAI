@@ -2,18 +2,12 @@ const OpenAI = require('openai')
 require('dotenv').config()
 const uploadFile = require('./google.js')
 const prisma = require('../src/prisma.js')
-const express = require('express')
 const updateDate = require('./date.js')
 const download = require('./download.js')
+var schedule = require('node-schedule');
 const Write = require('./json.js')
 const fs = require('fs')
 
-const app = express()
-
-app.listen(3000, () => {
-    console.log("server started");
-    main()
-  });
 
 
   const data = {
@@ -38,6 +32,9 @@ let date = process.env.DATE;
 // Split the string into an array of words
 let dateArray = date.split('/');
 
+var j = schedule.scheduleJob(date, function(){
+  console.log('job is running');
+});
 
     // Get date.
     let currentDate = new Date(parseInt(dateArray[2]), parseInt(dateArray[0] - 1), parseInt(dateArray[1]));
@@ -174,5 +171,6 @@ async function checkAndUpdateDate() {
 checkAndUpdateDate();
 
 }
+main()
 
-module.exports= app
+module.exports= main
