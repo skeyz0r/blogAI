@@ -24,7 +24,7 @@ const fs = require('fs')
 
 function start()
 {
-cron.schedule("* * * * *",() => {
+cron.schedule("0 0 * * *",() => {
   main()
   });
 
