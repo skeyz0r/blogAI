@@ -29,6 +29,8 @@ function main()
 {
   
   cron.schedule('0 10 * * 1', async () => {   
+    let date = process.env.DATE;
+
 // Split the string into an array of words
 
     const filePath = './minimalist.json';
@@ -87,7 +89,7 @@ function main()
       }
         console.log('Name:' + name, 'Url:'+ url, "text: " + text)
 
-        const image = await OpenAI.images.generate(
+        const image = await openai.images.generate(
           {
           model: "dall-e-3",
           prompt: `Generate a pciture for this article: ${name}`,
