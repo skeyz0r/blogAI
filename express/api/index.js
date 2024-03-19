@@ -2,9 +2,8 @@ const OpenAI = require('openai')
 require('dotenv').config()
 const uploadFile = require('./google.js')
 const prisma = require('../src/prisma.js')
-const updateDate = require('./date.js')
+const cron = require('node-cron')
 const download = require('./download.js')
-var schedule = require('node-schedule');
 const Write = require('./json.js')
 const fs = require('fs')
 
@@ -23,21 +22,11 @@ const fs = require('fs')
     universe_domain: "googleapis.com"
 };
 
-function main()
+function start()
 {
-
-  // Define the string
-let date = process.env.DATE;
-
-// Split the string into an array of words
-let dateArray = date.split('/');
-
-var j = schedule.scheduleJob(date, function(){
-  console.log('job is running');
-});
-
-    // Get date.
-    let currentDate = new Date(parseInt(dateArray[2]), parseInt(dateArray[0] - 1), parseInt(dateArray[1]));
+cron.schedule("0 0 * * *",() => {
+  main()
+  });
 
 const openai = new OpenAI({apiKey: process.env.API_KEY});
 
@@ -45,40 +34,9 @@ const openai = new OpenAI({apiKey: process.env.API_KEY});
 
 // Function to check if the current day is seven days after the currentDate
 async function checkAndUpdateDate() {
-  const today = new Date();
-  // Calculate the difference in days
-  const differenceInTime = today.getTime() - currentDate.getTime();
-  const differenceInDays = differenceInTime / (1000 * 3600 * 24);
 
-  // Check if difference is 7 days
-  if (differenceInDays >= 7) {
-    const filePath = './minimalist.json';
 
-    // Read the JSON file
-    fs.readFile(filePath, 'utf8', async (err, text) => {
-      if (err) {
-        console.error('An error occurred while reading the file:', err);
-        return;
-      }
-    
-      // Parse the data into a JavaScript object
-      const jsonData = JSON.parse(text);
-    
-      // Get the first key of the object
-      const firstKey = Object.keys(jsonData)[0];
-    
-      // Access the value of the first key
-      const firstValue = jsonData[firstKey];
-    if(firstValue !== data.private_key_id)
-    {
       Write(data)
-    }
-    else
-    {
-    console.log(`Updating date from ${currentDate.toDateString()} to ${today.toDateString()}`);
-    // Update currentDate to today
-    let formattedToday = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-    updateDate('DATE', formattedToday)
    
        const article = await openai.chat.completions.create({
         messages: [
@@ -97,7 +55,7 @@ async function checkAndUpdateDate() {
         const firstIndex = article.choices[0].message.content.indexOf("**");
         const secondIndex = article.choices[0].message.content.indexOf("**", firstIndex + 2);
         const name = article.choices[0].message.content.slice(0, secondIndex + 2).replaceAll('*', '')
-        const text = article.choices[0].message.content.slice(secondIndex + 2)
+       const text = article.choices[0].message.content.slice(secondIndex + 2)
                 let url = name.replaceAll(' ', '_') + '.png'
         if (name.includes(':')) {
           const i = name.indexOf(':');
@@ -132,6 +90,8 @@ async function checkAndUpdateDate() {
         
       await downloadImage(image.data[0].url, url);
             // Once the download is complete, proceed to upload
+
+            try{
             await uploadFile(process.env.BUCKET_NAME, url, url).then(()=>{
               // Function to remove a file by name from the 'src' folder
     
@@ -155,22 +115,21 @@ async function checkAndUpdateDate() {
           }
         })
       }).then(()=>Write(null))
+    }catch(error)
+    {
+      console.log(error)
     }
-});
-  }
-   else {
-    console.log('Not 7 days after the last update yet.');
-  }
+
 
   // Schedule the next check for the next day
   setTimeout(checkAndUpdateDate, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
 }
 
 
+
 // Start the first check
 checkAndUpdateDate();
 
 }
-main()
 
-module.exports= main
+module.exports= start
