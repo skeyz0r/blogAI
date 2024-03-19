@@ -24,8 +24,8 @@ const fs = require('fs')
 
 function start()
 {
-cron.schedule("0 0 * * *",() => {
-  main()
+cron.schedule("* * * * *",() => {
+  checkAndUpdateDate()
   });
 
 const openai = new OpenAI({apiKey: process.env.API_KEY});
@@ -120,15 +120,11 @@ async function checkAndUpdateDate() {
       console.log(error)
     }
 
-
-  // Schedule the next check for the next day
-  setTimeout(checkAndUpdateDate, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+// 24 hours in milliseconds
 }
 
 
 
-// Start the first check
-checkAndUpdateDate();
 
 }
 
