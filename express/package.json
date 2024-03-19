@@ -28,7 +28,7 @@
     "helmet": "^7.1.0",
     "latest-version": "^9.0.0",
     "morgan": "^1.10.0",
-    "node-cron": "^3.0.3",
+    "node-schedule": "^2.1.1",
     "openai": "^4.29.0",
     "path": "^0.12.7",
     "request": "^2.88.2"

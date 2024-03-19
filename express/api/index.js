@@ -4,7 +4,7 @@ const uploadFile = require('./google.js')
 const prisma = require('../src/prisma.js')
 const updateDate = require('./date.js')
 const download = require('./download.js')
-var cron = require('node-cron');
+var schedule = require('node-schedule');
 const Write = require('./json.js')
 const fs = require('fs')
 
@@ -23,16 +23,35 @@ const fs = require('fs')
     universe_domain: "googleapis.com"
 };
 
-
-
 function main()
 {
-  
-  cron.schedule('0 10 * * 1', async () => {   
-    let date = process.env.DATE;
+
+  // Define the string
+let date = process.env.DATE;
 
 // Split the string into an array of words
+let dateArray = date.split('/');
 
+var j = schedule.scheduleJob(date, function(){
+  console.log('job is running');
+});
+
+    // Get date.
+    let currentDate = new Date(parseInt(dateArray[2]), parseInt(dateArray[0] - 1), parseInt(dateArray[1]));
+
+const openai = new OpenAI({apiKey: process.env.API_KEY});
+
+
+
+// Function to check if the current day is seven days after the currentDate
+async function checkAndUpdateDate() {
+  const today = new Date();
+  // Calculate the difference in days
+  const differenceInTime = today.getTime() - currentDate.getTime();
+  const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+
+  // Check if difference is 7 days
+  if (differenceInDays >= 7) {
     const filePath = './minimalist.json';
 
     // Read the JSON file
@@ -138,8 +157,20 @@ function main()
       }).then(()=>Write(null))
     }
 });
-})
+  }
+   else {
+    console.log('Not 7 days after the last update yet.');
+  }
+
+  // Schedule the next check for the next day
+  setTimeout(checkAndUpdateDate, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+}
+
+
+// Start the first check
+checkAndUpdateDate();
 
 }
+main()
 
 module.exports= main
