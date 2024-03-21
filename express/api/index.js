@@ -6,6 +6,7 @@ const cron = require('node-cron')
 const download = require('./download.js')
 const Write = require('./json.js')
 const fs = require('fs')
+const app = require('../src/app.js')
 
 
 
@@ -24,7 +25,8 @@ const fs = require('fs')
 
 function start()
 {
-cron.schedule("* * * * *",() => {
+  console.log("We started")
+cron.schedule("0 0 * * *",() => {
   checkAndUpdateDate()
   });
 
@@ -120,12 +122,11 @@ async function checkAndUpdateDate() {
       console.log(error)
     }
 
-// 24 hours in milliseconds
 }
-
-
-
 
 }
 
-module.exports= start
+start()
+
+
+module.exports= app;
